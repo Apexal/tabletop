@@ -79,16 +79,6 @@
 	}
 </script>
 
-<h1>Map Demo</h1>
-
-<pre><code>{JSON.stringify(tokenConfigs)}</code></pre>
-
-<ul>
-	{#each data.tokens as token (token.id)}
-		<li>{token.display_name}</li>
-	{/each}
-</ul>
-
 {#if typeof window !== 'undefined'}
 	<Stage config={{ width: window.innerWidth, height: window.innerHeight, draggable: true }}>
 		<Layer>
