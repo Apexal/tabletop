@@ -1,39 +1,10 @@
 <script lang="ts">
+	import Token from '$lib/Token.svelte';
 	import { supabase } from '$lib/supabaseClient.js';
 	import { onMount } from 'svelte';
 	import { Stage, Layer, Circle, type KonvaDragTransformEvent } from 'svelte-konva';
 
 	export let data;
-
-	let tokenConfigs = {};
-	let tokenHandles = {};
-
-	$: {
-		for (let i = 0; i < data.tokens.length; i++) {
-			const token = data.tokens[i];
-			const tokenConfig = tokenConfigs[token.id];
-
-			if (tokenConfig) {
-				if (token.x !== tokenConfig.x || token.y !== tokenConfig.y) {
-          tokenHandles[token.id].to({
-            x: token.x,
-            y: token.y,
-            duration: 0.5
-          });
-				}
-			} else {
-        console.log("resetting");
-        
-        tokenConfigs[token.id] = {
-          x: token.x,
-          y: token.y,
-          radius: 50,
-          fill: 'green',
-          draggable: true
-        }
-      }
-		}
-	}
 
 	onMount(() => {
 		const channel = supabase
@@ -45,8 +16,6 @@
 					schema: 'public'
 				},
 				(payload) => {
-					console.log(payload);
-
 					if (payload.eventType === 'INSERT') {
 						data.tokens = [...data.tokens, payload.new];
 					} else if (payload.eventType === 'DELETE') {
@@ -66,9 +35,8 @@
 		return () => channel.unsubscribe();
 	});
 
-	async function handleDragEnd(ev: KonvaDragTransformEvent, tokenId: string) {
+	async function handleTokenDragEnd(ev: KonvaDragTransformEvent, tokenId: number) {
 		const { x, y } = ev.detail.target.attrs;
-
 		const { status, error } = await supabase
 			.from('tokens')
 			.update({
@@ -83,12 +51,18 @@
 	<Stage config={{ width: window.innerWidth, height: window.innerHeight, draggable: true }}>
 		<Layer>
 			{#each data.tokens as token (token.id)}
-				<Circle
-					config={tokenConfigs[token.id]}
-          bind:handle={tokenHandles[token.id]}
-					staticConfig
-					on:dragend={(ev) => handleDragEnd(ev, token.id)}
-				/>
+				{#if token.x && token.y}
+        <Token
+					config={{
+            fill: "green",
+            radius: 50,
+            x: token.x,
+            y: token.y,
+            draggable: true
+          }}
+					handleDragEnd={(ev) => handleTokenDragEnd(ev, token.id)}
+				/>          
+        {/if}
 			{/each}
 		</Layer>
 	</Stage>

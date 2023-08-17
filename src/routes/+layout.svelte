@@ -58,8 +58,8 @@
 		display: flex;
 		gap: 8px;
 		justify-content: space-between;
-    background-color: slategrey;
-    padding: 16px;
+		background-color: slategrey;
+		padding: 16px;
 	}
 
 	.navbar .menu {
@@ -67,9 +67,9 @@
 		gap: 8px;
 	}
 
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 16px;
-  }
+	main {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 16px;
+	}
 </style>
