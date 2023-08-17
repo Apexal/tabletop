@@ -40,8 +40,8 @@
 		const { status, error } = await supabase
 			.from('tokens')
 			.update({
-				x,
-				y
+				x: Math.round(x),
+				y: Math.round(y)
 			})
 			.eq('id', tokenId);
 	}
@@ -56,8 +56,8 @@
 					config={{
             fill: "green",
             radius: 50,
-            x: token.x,
-            y: token.y,
+            x: Math.round(token.x),
+            y: Math.round(token.y),
             draggable: true
           }}
 					handleDragEnd={(ev) => handleTokenDragEnd(ev, token.id)}

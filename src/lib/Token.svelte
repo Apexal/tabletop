@@ -1,24 +1,45 @@
 <script lang="ts">
 	import type { CircleConfig } from 'konva/lib/shapes/Circle';
 	import { Circle, type KonvaDragTransformEvent } from 'svelte-konva';
-	import { tweened } from 'svelte/motion';
+	import { spring } from 'svelte/motion';
 
 	export let config: CircleConfig;
-    let realConfig;
 	export let handleDragEnd: (e: KonvaDragTransformEvent) => void;
-	const x = tweened(config.x ?? 0);
-	const y = tweened(config.y ?? 0);
+	const pos = spring(
+		{
+			x: config.x,
+			y: config.y
+		},
+		{
+			stiffness: 0.1,
+			damping: 1
+		}
+	);
 
 	$: {
-		x.set(config.x ?? 0);
-		y.set(config.y ?? 0);
+		pos.set({
+			x: config.x,
+			y: config.y
+		});
 	}
-
-	$: realConfig = {
-        ...config,
-        x: $x,
-        y: $y,
-    };
 </script>
 
-<Circle config={realConfig} on:dragend={handleDragEnd} />
+<Circle
+	config={{
+		...config,
+		...$pos
+	}}
+	on:dragend={(e) => {
+		const { x, y } = e.detail.target.attrs;
+		pos.set(
+			{
+				x,
+				y
+			},
+			{
+				hard: 1
+			}
+		);
+		handleDragEnd(e);
+	}}
+/>
