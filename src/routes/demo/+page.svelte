@@ -83,9 +83,13 @@
 						{gridCellSize}
 						config={{
 							fill: 'green',
-							radius: gridCellSize,
+							radius: gridCellSize / 2,
 							x: Math.round(token.x),
 							y: Math.round(token.y),
+              offset: {
+                x: gridCellSize / 2,
+                y: gridCellSize / 2
+              },
 							draggable: true
 						}}
 						on:moveTo={(ev) => handleTokenMoveTo(token.id, ev.detail)}
