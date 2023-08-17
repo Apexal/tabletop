@@ -1,10 +1,14 @@
 <script lang="ts">
 	import type { CircleConfig } from 'konva/lib/shapes/Circle';
+	import { createEventDispatcher } from 'svelte';
 	import { Circle, type KonvaDragTransformEvent } from 'svelte-konva';
 	import { spring } from 'svelte/motion';
 
+	export let gridCellSize: number;
 	export let config: CircleConfig;
-	export let handleDragEnd: (e: KonvaDragTransformEvent) => void;
+
+	const dispatch = createEventDispatcher();
+
 	const pos = spring(
 		{
 			x: config.x,
@@ -30,7 +34,13 @@
 		...$pos
 	}}
 	on:dragend={(e) => {
-		const { x, y } = e.detail.target.attrs;
+		let { x, y } = e.detail.target.attrs;
+
+        // TODO: check bounds
+
+		x = Math.round(x / gridCellSize) * gridCellSize;
+		y = Math.round(y / gridCellSize) * gridCellSize;
+
 		pos.set(
 			{
 				x,
@@ -40,6 +50,7 @@
 				hard: 1
 			}
 		);
-		handleDragEnd(e);
+
+		dispatch('moveTo', { x, y });
 	}}
 />

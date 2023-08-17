@@ -6,6 +6,8 @@
 
 	export let data;
 
+  const gridCellSize = 50;
+
 	onMount(() => {
 		const channel = supabase
 			.channel('tokens_changes')
@@ -35,13 +37,12 @@
 		return () => channel.unsubscribe();
 	});
 
-	async function handleTokenDragEnd(ev: KonvaDragTransformEvent, tokenId: number) {
-		const { x, y } = ev.detail.target.attrs;
+	async function handleTokenMoveTo(tokenId: number, pos: { x: number; y: number }) {
 		const { status, error } = await supabase
 			.from('tokens')
 			.update({
-				x: Math.round(x),
-				y: Math.round(y)
+				x: Math.round(pos.x),
+				y: Math.round(pos.y)
 			})
 			.eq('id', tokenId);
 	}
@@ -51,16 +52,17 @@
 	<Stage config={{ width: window.innerWidth, height: window.innerHeight, draggable: true }}>
 		<Layer>
 			{#each data.tokens as token (token.id)}
-				{#if token.x && token.y}
+				{#if token.x !== null && token.y !== null}
         <Token
+          {gridCellSize}
 					config={{
             fill: "green",
-            radius: 50,
+            radius: gridCellSize,
             x: Math.round(token.x),
             y: Math.round(token.y),
             draggable: true
           }}
-					handleDragEnd={(ev) => handleTokenDragEnd(ev, token.id)}
+          on:moveTo={(ev) => handleTokenMoveTo(token.id, ev.detail)}
 				/>          
         {/if}
 			{/each}
